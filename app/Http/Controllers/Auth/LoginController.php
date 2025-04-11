@@ -3,28 +3,17 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User; // Make sure the User model is imported
+use Illuminate\Foundation\Auth\AuthenticatesUsers; // Use the AuthenticatesUsers trait
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
+    // Use the AuthenticatesUsers trait for built-in authentication methods
     use AuthenticatesUsers;
 
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
+    // The redirect path after a user logs in successfully
     protected $redirectTo = '/home';
 
     /**
@@ -34,15 +23,26 @@ class LoginController extends Controller
      */
     public function __construct()
     {
+        // Only allow guests to access login functions, except for logout
         $this->middleware('guest')->except('logout');
+        // Only authenticated users can log out
         $this->middleware('auth')->only('logout');
     }
-    protected function authenticated(Request $request, $user),
+
+    /**
+     * The action to take after the user is authenticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function authenticated(Request $request, $user)
     {
+        // Check the user's role and redirect accordingly
         if ($user->role == 'admin') {
             return redirect('/admin/dashboard');
-        }else {
+        } else {
             return redirect('/user/dashboard');
         }
-     }   
-
+    }
+}
